@@ -49,15 +49,19 @@ namespace ConsoleApp14
             foreach (DataRow row in ds.Tables["data"].Rows)
             {
                 _filename = row["Prod_ID"].ToString() + ".tsv";
-                _fullPathWhereToSave = System.IO.Path.Combine(path, _filename);
-                if (File.Exists(_fullPathWhereToSave) && File.ReadAllBytes(_fullPathWhereToSave).Length > 0)
-                {
-                    
-                    DataSet productDetails = TextToDataSet.Convert(_fullPathWhereToSave, "data", "\t");
-                    fixColumns(productDetails);
-                    Console.WriteLine("Processing.. " + _filename + " with " + productDetails.Tables["data"].Rows.Count + " File " + i + " of " + ds.Tables["data"].Rows.Count);
-                    UpdateProductDetailsDB(productDetails);
-                }
+                _fullPathWhereToSave = System.IO.Path.Combine(path,"files", _filename);
+                _url = @"https://www.wisvis.com/product/" + _filename;
+                //StartDownload(60);
+                FileDownloader fd = new FileDownloader(_url, _fullPathWhereToSave, _filename);
+                fd.StartDownload(60);
+                //if (File.Exists(_fullPathWhereToSave) && File.ReadAllBytes(_fullPathWhereToSave).Length > 0)
+                //{
+
+                //    DataSet productDetails = TextToDataSet.Convert(_fullPathWhereToSave, "data", "\t");
+                //    fixColumns(productDetails);
+                //    Console.WriteLine("Processing.. " + _filename + " with " + productDetails.Tables["data"].Rows.Count + " File " + i + " of " + ds.Tables["data"].Rows.Count);
+                //    UpdateProductDetailsDB(productDetails);
+                //}
                 i++;
             }
             Console.WriteLine("Done  - success: ");
@@ -121,7 +125,7 @@ namespace ConsoleApp14
 
         static void InsertProductIndex(DataSet ds)
         {
-            const string DB_CONN_STR = "Server=127.0.0.1;Uid=root;Pwd=marcus24;Database=catalog;";
+            const string DB_CONN_STR = "Server=127.0.0.1;Uid=root;Pwd=marcus24;Database=wvacatalog;";
             StringBuilder sCommand = new StringBuilder("INSERT INTO productindex (prodid, description,vendor,startdate,comments,stopdate) VALUES ");
 
 
@@ -168,7 +172,7 @@ namespace ConsoleApp14
         
         static void UpdateProductDetailsDB(DataSet ds)
         {
-            const string DB_CONN_STR = "Server=127.0.0.1;Uid=root;Pwd=marcus24;Database=catalog;";
+            const string DB_CONN_STR = "Server=127.0.0.1;Uid=root;Pwd=marcus24;Database=wvacatalog;";
             StringBuilder sCommand = new StringBuilder("INSERT INTO productdetails (description, wvaproductkey,base,diameter,sphere,cylinder,axis,prdadd,color,multifocal,upc,modality,vendor,revdiag,wvasku) VALUES ");
 
          
